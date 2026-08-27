@@ -29,8 +29,8 @@ External:  RevenueCat, Bitly API
 | Phase | 状況 | 目標 |
 |-------|------|------|
 | **Phase 0** | ✅ 完了 | 企画・ゲームバランス検証済み |
-| **Phase 1** | 🔄 進行中 | UI + Bot初期実装（データモデル✅ ロジック✅ AI✅） |
-| **Phase 2** | ⏳ 待機 | Bot先手勝率50%確認 |
+| **Phase 1** | ✅ 完了 | UI + Bot初期実装（データモデル✅ ロジック✅ AI✅ UI✅） |
+| **Phase 2** | 🔄 進行中 | Bot先手勝率50%調整（パラメータテスト中） |
 | **Phase 3** | ⏳ 待機 | ハイライト生成MVP |
 | **Phase 4** | ⏳ 待機 | テスト・ストア準備 → ソフトローンチ |
 
@@ -47,10 +47,12 @@ rambu_shogi/
 │   │   └── highlight.dart   # ハイライト動画entity (TODO)
 │   │
 │   ├── services/            # ビジネスロジック
-│   │   ├── game_logic.dart      # 着手判定・詰み判定
-│   │   ├── ai_engine.dart       # 評価関数・アルファベータ
+│   │   ├── game_logic.dart      # ✅ 着手判定・詰み判定
+│   │   ├── ai_engine.dart       # ✅ 評価関数・アルファベータ
+│   │   ├── evaluation_params.dart   # ✅ Phase 2: パラメータ調整用
+│   │   ├── benchmark_utils.dart     # ✅ Phase 2: テスト用ユーティリティ
+│   │   ├── highlight_service.dart   # ✅ Phase 3: ハイライト検出（基本）
 │   │   ├── firestore_service.dart   # (TODO)
-│   │   ├── highlight_service.dart   # (TODO)
 │   │   └── analytics_service.dart   # (TODO)
 │   │
 │   ├── viewmodels/          # Riverpod プロバイダ
@@ -77,9 +79,12 @@ rambu_shogi/
 ├── test/                    # ユニットテスト
 │   ├── models/
 │   │   └── board_test.dart  # ✅
-│   └── services/
-│       ├── game_logic_test.dart  # ✅
-│       └── ai_engine_test.dart   # ✅
+│   ├── services/
+│   │   ├── game_logic_test.dart  # ✅
+│   │   └── ai_engine_test.dart   # ✅
+│   ├── benchmarks/
+│   │   └── bot_benchmark.dart    # ✅ Phase 1: 100ゲーム検証
+│   └── phase2_parameter_test.dart    # ✅ Phase 2: パラメータ調整
 │
 ├── pubspec.yaml             # ✅ 依存パッケージ
 ├── CLAUDE.md                # ✅ 開発ガイド
@@ -166,11 +171,27 @@ flutter test
 
 ### AI ベンチマーク
 
-100局自動対局で先手勝率を計測（Phase 2で実施）
+#### Phase 1 検証用ベンチマーク
+100局自動対局で先手勝率を計測
 
 ```bash
-dart run test/bot_benchmark.dart
+dart run test/benchmarks/bot_benchmark.dart
 ```
+
+#### Phase 2 パラメータ調整テスト
+先手勝率 50±3% を達成するための系統的なパラメータ調整
+
+```bash
+# 推奨: 段階的なテストを実行
+dart run test/phase2_parameter_test.dart
+
+# または個別に実行:
+# 1. ベースライン確認（10ゲーム）
+# 2. テンポボーナス変動テスト（5〜7テンポ × 5ゲーム）
+# 3. パラメータセット比較（5セット × 10ゲーム）
+```
+
+詳細は `docs/PHASE_2_ANALYSIS.md` と `PHASE_2_BALANCE_TUNING.md` を参照
 
 ## 📚 参考資料
 
@@ -181,6 +202,11 @@ dart run test/bot_benchmark.dart
 3. **ハイライト生成フロー** - 動画自動生成仕様
 4. **実装スケジュール** - Phase 0-4 の工程・人日
 5. **Code 引き継ぎ書** - 実装ガイド
+
+### Phase 2 関連ドキュメント
+
+- **PHASE_2_BALANCE_TUNING.md** - 先手勝率50%調整戦略
+- **docs/PHASE_2_ANALYSIS.md** - 詳細な評価関数分析と理論背景
 
 ## 🔗 関連リンク
 
